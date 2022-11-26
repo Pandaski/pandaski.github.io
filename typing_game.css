@@ -1,0 +1,161 @@
+#viewport {
+    background-color: #000;
+    font: 36px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    color:#ddd;
+}
+
+#startParticipate, #startExam, #gameover {
+    color:#ddd;
+    border: 0px solid red;
+    font: 36px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+#gameover .minior {
+    color:#ddd;
+    font: 18px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+#gameStatTitle {
+    font: 24px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+#gameStat {
+    color:#ddd;
+    font: 18px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    display: table;
+    text-align:center;
+    overflow: auto;
+}
+
+#gameStat .row  {
+    display: table-row;
+}
+
+#gameStat .left  {
+    display: table-cell;
+    text-align: right;
+    width: 280px;
+}
+
+#gameStat .right  {
+    display: table-cell;
+    text-align: right;
+    width: 80px;
+    color: yellow;
+}
+
+
+#examResultTitle {
+    font: 24px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+#examResult {
+    color:#ddd;
+    font: 18px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+    overflow: scoll;
+}
+
+#examResult .content {
+    color:#ddd;
+    font: 18px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+    display: title;
+}
+
+#examResult .row  {
+    display: table-row;
+}
+
+#examResult .left  {
+    display: table-cell;
+    text-align: right;
+    padding-right: 10px;
+    width: 300px;
+    border-bottom: 1px dotted #999;
+}
+
+#examResult .right  {
+    display: table-cell;
+    text-align: left;
+    padding-left: 10px;
+    width: 300px;
+    color: yellow;
+    border-bottom: 1px dotted #999;
+}
+
+
+#wordLoader, #help {
+    color:#ddd;
+    border: 0px solid red;
+    font: 24px 'Comic Sans MS',Verdana,Arial,sans-serif;
+
+}
+
+#helpPointer {
+    color:#ddd;
+    border: 0px solid red;
+    font: 80px 'Comic Sans MS',Verdana,Arial,sans-serif;
+
+}
+
+#score, #timer {
+    color:#ddd;
+    border: 0px solid red;
+    font: 18px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+#Chinese {
+    color:#ddd;
+    border: 0px solid red;
+    font: 60px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+#English {
+    color:#ddd;
+    border: 0px solid red;
+    font: 48px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+#voiceTips, #visualTips{
+    color:#ddd;
+    border: 0px solid red;
+    font: 36px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:left;
+}
+
+#EnglishTips{
+    color:#ddd;
+    border: 0px solid red;
+    font: 36px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+#helpDetail {
+    color:#ddd;
+    border: 1px solid white;
+    font: 20px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+
+}
+
+#helpDetail li{
+    color:#ddd;
+    margin-left:10px;
+    margin-right:10px;
+    font: 16px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+    background-color: #000000;
+}
+
+#helpDetailCloser {
+    color:#ddd;
+    border: 1px dotted white;
+    font: 16px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
