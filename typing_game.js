@@ -22,14 +22,14 @@ G.F.getExamSpeed = function (word) {
 }
 
 var GobVisiblityMapping = {
-    notReady: ['wordLoader', 'help', 'helpPointer'],
-    readyToRun: ['startParticipate', 'startExam', 'wordLoader', 'help', 'timer', 'score'],
-    runningP: ['Chinese', 'English', 'timer', 'score', 'voiceTips', 'visualTips', 'EnglishTips'],
-    prepareE: ['Chinese', 'timer', 'score'],
-    runningE: ['Chinese', 'timer', 'score'],
-    finishedP: ['gameover', 'timer', 'score', 'gameStat', 'gameStatTitle'],
-    finishedE: ['gameover', 'timer', 'score', 'examResultTitle', 'examResult'],
-    helpPopped: ['helpDetail', 'helpDetailCloser']
+    notReady: ['wordLoader', 'help', 'helpPointer', 'copyright'],
+    readyToRun: ['startParticipate', 'startExam', 'wordLoader', 'help', 'timer', 'score', 'copyright'],
+    runningP: ['Chinese', 'English', 'timer', 'score', 'voiceTips', 'visualTips', 'EnglishTips', 'copyright'],
+    prepareE: ['Chinese', 'timer', 'score', 'copyright'],
+    runningE: ['Chinese', 'timer', 'score', 'copyright'],
+    finishedP: ['gameover', 'timer', 'score', 'gameStat', 'gameStatTitle', 'copyright'],
+    finishedE: ['gameover', 'timer', 'score', 'examResultTitle', 'examResult', 'copyright'],
+    helpPopped: ['helpDetail', 'helpDetailCloser', 'copyright']
 }
 
 G.F.controlGobVisibility = function () {
@@ -84,6 +84,11 @@ G.F.loadMain = function () {
         .setVar({x:50, y:50, w:800, h:600})
         .turnOn();
     
+    G.makeGob('copyright', G.O.viewport)
+        .setVar({x:300, y:560, w:200, h:30})
+        .setSrc('© 2022 <a href="https://pandaski.github.io" target="_blank">Pandaski</a>')
+        .turnOn();
+        
     G.makeGob('Chinese', G.O.viewport)
         .setVar({x:0, y:100, w:800, h:75, AI: G.F.ChineseAI})
         .turnOff();
