@@ -180,7 +180,7 @@ G.F.loadMain = function () {
         .setVar({x:100, y:50, w:600, h:500})
         .setSrc('这是一个结合了英语背诵和打字训练的小工具，以下是使用方法。' + 
         '<ol ">' + 
-        '<li>用户提前准备一个单词列表文本文件(txt文件)。文件里每行有一个英语单词和对应的中文词，用逗号（,）分开。如图所示。<br>'+
+        '<li>用户提前准备一个单词列表文本文件(txt文件)。文件里每行有一个中文词和对应的英文单词，用逗号（,）分开。如图所示。注意：必须中文在前英文在后。<br>'+
         '<img width="200px" src="data:image/png;base64,' + resources.image.EXAMPLE + '">' +
         '</li>' +
         '<li>英语单词里可以有字母或空格，但不能有其他符号。</li>' +
@@ -337,6 +337,9 @@ G.F.helpPointerAI = function () {
     var t = this;
     if (t.on) {
         t.setStyle({opacity:Math.abs(Math.cos(G.iteration/12))}).draw();
+        if (t.tagContainsMouseClick()) {
+            G.S.gameStage = GameStage.helpPopped;
+        }
     }
     return t;
 }
