@@ -17,8 +17,8 @@ var GameStage = {
     helpPopped: 999
 }
 
-G.F.getExamSpeed = function (word) {
-    return 10 + word.length * 0.7; 
+G.F.getExamSpeed = function (o) {
+    return 10 + (o.Chinese.length + o.English.length) * 0.5; 
 }
 
 var GobVisiblityMapping = {
@@ -274,7 +274,7 @@ G.F.mainAI = function () {
     
     if (G.S.gameStage == GameStage.runningE) {
         var now = new Date();
-        if (Math.floor((now - G.O.Chinese.S.startTime) / 1000) >= G.F.getExamSpeed(G.S.wordList[G.S.wordIndex].English)) {
+        if (Math.floor((now - G.O.Chinese.S.startTime) / 1000) >= G.F.getExamSpeed(G.S.wordList[G.S.wordIndex])) {
             G.S.wordIndex ++;
             G.S.finishedCount ++;
             
@@ -594,8 +594,8 @@ G.F.textToArray = function(str, delimiter = ",") {
         if (row.indexOf(delimiter) >= 0) {
             var values = row.split(delimiter);
             arr.push({
-                Chinese: values[0],
-                English: values[1]
+                Chinese: values[0].trim(),
+                English: values[1].trim()
             }); 
         }
     }  
@@ -685,6 +685,7 @@ G.F.gameStageChanged = function (prevGameStage, nowGameStage) {
     if (nowGameStage == GameStage.prepareE) {
         var now = new Date();
         G.setState({'startExamPrepare': now});
+        G.O.Chinese.setSrc('').draw();
         G.O.audioPlayer.play('static', 'examPrepare', null, true, true);
     }
 }
