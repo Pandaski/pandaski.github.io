@@ -14,6 +14,7 @@ var GameStage = {
     runningE: 25,
     finishedP: 30,
     finishedE: 40,
+    pausing: 100,
     helpPopped: 999
 }
 
@@ -24,11 +25,12 @@ G.F.getExamSpeed = function (o) {
 var GobVisiblityMapping = {
     notReady: ['wordLoader', 'help', 'helpPointer', 'copyright'],
     readyToRun: ['startParticipate', 'startExam', 'wordLoader', 'help', 'timer', 'score', 'copyright'],
-    runningP: ['Chinese', 'English', 'timer', 'score', 'voiceTips', 'visualTips', 'EnglishTips', 'copyright'],
+    runningP: ['Chinese', 'English', 'timer', 'score', 'voiceTips', 'visualTips', 'EnglishTips', 'copyright', 'pause'],
     prepareE: ['Chinese', 'timer', 'score', 'copyright'],
-    runningE: ['Chinese', 'timer', 'score', 'copyright'],
+    runningE: ['Chinese', 'timer', 'score', 'copyright', 'pause'],
     finishedP: ['gameover', 'timer', 'score', 'gameStat', 'gameStatTitle', 'copyright'],
-    finishedE: ['gameover', 'timer', 'score', 'examResultTitle', 'examResult', 'copyright'],
+    finishedE: ['gameover', 'timer', 'score', 'examResultTitle', 'examResult', 'copyright', 'pauseStat'],
+    pausing: ['pauseForm', 'timer', 'score'],
     helpPopped: ['helpDetail', 'helpDetailCloser', 'copyright']
 }
 
@@ -70,7 +72,9 @@ G.F.loadMain = function () {
             timeUsed: 0,
             finishedWithoutErrOrTips: 0,
             voiceTipsUsed: 0,
-            visualTipsUsed: 0
+            visualTipsUsed: 0,
+            pausedTime: 0,
+            pausedTimes: 0
         }
     }
     
@@ -84,6 +88,29 @@ G.F.loadMain = function () {
         .setVar({x:50, y:50, w:800, h:600})
         .turnOn();
     
+    G.makeGob('pause', G.O.viewport)
+        .setVar({x:20, y:20, w:60, h:60, AI: G.F.pauseAI})
+        .setSrc('&#9208;')
+        .turnOff();
+    
+    G.makeGob('pauseForm', G.O.viewport)
+        .setVar({x:300, y:200, w:200, h:100})
+        .turnOff();
+        
+    G.makeGob('pauseResume', G.O.pauseForm)
+        .setVar({x:0, y:15, w:200, h:200, AI: G.F.pauseResumeAI})
+        .setSrc('Resume')
+        .turnOn();
+         
+    G.makeGob('pauseQuit', G.O.pauseForm)
+        .setVar({x:0, y:55, w:200, h:200, AI: G.F.pauseQuitAI})
+        .setSrc('Quit')
+        .turnOn();
+        
+    G.makeGob('pauseStat', G.O.viewport)
+        .setVar({x:200, y:50, w:400, h:50})
+        .turnOff();
+        
     G.makeGob('copyright', G.O.viewport)
         .setVar({x:300, y:560, w:200, h:30})
         .setSrc('© 2022 <a href="https://pandaski.github.io" target="_blank">Pandaski</a>')
@@ -162,7 +189,7 @@ G.F.loadMain = function () {
 
     G.makeGob('examResultTitle', G.O.viewport)
         .setVar({x:250, y:100, w:300, h:40})
-        .setSrc('Exam List')
+        .setSrc('Exam Word List')
         .turnOff();
     
     G.makeGob('examResult', G.O.viewport)
@@ -236,6 +263,9 @@ G.F.mainAI = function () {
     G.O.help.AI();
     G.O.helpDetailCloser.AI();
     G.O.helpPointer.AI();
+    G.O.pause.AI();
+    G.O.pauseResume.AI();
+    G.O.pauseQuit.AI();
     
     
     G.F.controlGobVisibility();
@@ -244,7 +274,7 @@ G.F.mainAI = function () {
     if (G.S.gameStage == GameStage.runningP || G.S.gameStage == GameStage.runningE) {
         // timer
         var now = new Date();
-        var runInSec = Math.floor((now - G.S.startTime)/1000);
+        var runInSec = Math.floor((now - G.S.startTime - G.S.gameStat.pausedTime)/1000);
         var runInMin = Math.floor(runInSec / 60);
         runInSec = runInSec % 60;
         
@@ -264,7 +294,7 @@ G.F.mainAI = function () {
             }
             
             if (G.S.finishedCount == G.S.wordList.length) {
-                G.S.gameStat.timeUsed = Math.floor((now - G.S.startTime)/1000);
+                G.S.gameStat.timeUsed = Math.floor((now - G.S.startTime - G.S.gameStat.pausedTime)/1000);
                 G.S.gameStage = GameStage.finishedP;
             } else {
                 G.F.flushWord();
@@ -274,12 +304,12 @@ G.F.mainAI = function () {
     
     if (G.S.gameStage == GameStage.runningE) {
         var now = new Date();
-        if (Math.floor((now - G.O.Chinese.S.startTime) / 1000) >= G.F.getExamSpeed(G.S.wordList[G.S.wordIndex])) {
+        if (Math.floor((now - G.O.Chinese.S.startTime - G.S.gameStat.pausedTime) / 1000) >= G.F.getExamSpeed(G.S.wordList[G.S.wordIndex])) {
             G.S.wordIndex ++;
             G.S.finishedCount ++;
             
             if (G.S.finishedCount == G.S.wordList.length) {
-                G.S.gameStat.timeUsed = Math.floor((now - G.S.startTime)/1000);
+                G.S.gameStat.timeUsed = Math.floor((now - G.S.startTime - G.S.gameStat.pausedTime)/1000);
                 G.S.gameStage = GameStage.finishedE;
                 G.O.audioPlayer.play('static',  'examStop', null, false, true);
             } else {
@@ -422,7 +452,13 @@ G.F.ChineseAI = function () {
 
 G.F.flushWord = function () {
     var word = G.S.wordList[G.S.wordIndex];
-    G.O.Chinese.setSrc(word.Chinese).draw();
+    G.O.Chinese.setSrc(word.Chinese);
+    if (word.Chinese.length > 10) {
+        G.O.Chinese.addClass('small');
+    } else {
+        G.O.Chinese.removeClass('small');
+    }
+    G.O.Chinese.draw();
     
     G.O.English.S.word = word.English;
     G.O.English.setSrc('').draw();
@@ -655,6 +691,7 @@ G.F.gameStageChanged = function (prevGameStage, nowGameStage) {
         G.S.finishedCount = 0;
         G.O.timer.setSrc('00:00').draw();
         G.O.score.setSrc('0/' + G.S.wordList.length).draw();
+        G.S.gameStat.pausedTime = 0;
     }
     
     if (nowGameStage == GameStage.finishedP) {
@@ -680,6 +717,15 @@ G.F.gameStageChanged = function (prevGameStage, nowGameStage) {
         }
         
         G.O.examResult.setSrc('<div class="content">' + examResultSrc + '</div>').draw();
+        
+        if (G.S.gameStat.pausedTimes > 0) {
+            var pausedTimeSec = Math.ceil(G.S.gameStat.pausedTime/1000);
+            var pausedTimeStr = Math.floor(pausedTimeSec/60) + "' " + (pausedTimeSec % 60) + '"'
+            var pauseStatStr = 'Paused ' + G.S.gameStat.pausedTimes + ' times for ' + pausedTimeStr;
+            G.O.pauseStat.setSrc(pauseStatStr);
+        } else {
+            G.O.pauseStat.setSrc('');
+        }
     }
     
     if (nowGameStage == GameStage.prepareE) {
@@ -688,6 +734,12 @@ G.F.gameStageChanged = function (prevGameStage, nowGameStage) {
         G.O.Chinese.setSrc('').draw();
         G.O.audioPlayer.play('static', 'examPrepare', null, true, true);
     }
+    
+    if (nowGameStage == GameStage.pausing) {
+        var now = new Date();
+        G.S.pauseStart = now;
+    }
+
 }
 
 
@@ -704,11 +756,46 @@ G.F.startGame = function (){
         timeUsed: 0,
         finishedWithoutErrOrTips: 0,
         voiceTipsUsed: 0,
-        visualTipsUsed: 0
+        visualTipsUsed: 0,
+        pausedTime: 0,
+        pausedTimes: 0
     }
     
     G.F.flushWord();  
     
+}
+
+G.F.pauseAI = function () {
+    var t = this;
+    
+    if (t.on && !G.S.audioLocked && t.tagContainsMouseClick()) {        
+        G.S.gameStage = GameStage.pausing;
+        G.S.gameStat.pausedTimes += 1;
+    }
+    
+    return t;
+}
+
+G.F.pauseResumeAI = function () {
+    var t = this;    
+    if (t.on && !G.S.audioLocked && t.tagContainsMouseClick()) { 
+        console.log(G.S.prevGameStage)       
+        G.S.gameStage = G.S.prevGameStage;
+        var now = new Date();
+        G.S.gameStat.pausedTime += now - G.S.pauseStart;
+        
+    }
+    
+    return t;
+}
+
+G.F.pauseQuitAI = function () {
+    var t = this;    
+    if (t.on && !G.S.audioLocked && t.tagContainsMouseClick()) {        
+        G.S.gameStage = GameStage.readyToRun;
+    }
+    
+    return t;
 }
 
 G.makeBlock('main', G.F.loadMain).loadBlock('main'); 

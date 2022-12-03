@@ -104,19 +104,34 @@
     font: 80px 'Comic Sans MS',Verdana,Arial,sans-serif;
 }
 
-#score, #timer, #copyright {
+#score, #timer, #copyright, #pause {
     color:#ddd;
     border: 0px solid red;
     font: 18px 'Comic Sans MS',Verdana,Arial,sans-serif;
     text-align:center;
 }
 
-#Chinese {
+#pause {
+    cursor: pointer;
+}
+
+#pauseStat {
+    color:yellow;
+    border: 0px solid red;
+    font: 18px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    text-align:center;
+}
+
+[id=Chinese] {
     color:#ddd;
     border: 0px solid red;
     font: 60px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
     text-align:center;
     cursor: pointer;
+}
+
+.small {
+    font-size: 28px;
 }
 
 #English {
@@ -145,7 +160,6 @@
     color:#ddd;
     border: 1px solid white;
     font: 20px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
-
 }
 
 #helpDetail li{
@@ -162,4 +176,16 @@
     font: 16px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
     text-align:center;
     cursor: pointer;
+}
+
+#pauseForm {
+    color:#ddd;
+    border: 1px solid white;
+    text-align:center;
+    font: 20px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+}
+
+#pauseQuit, #pauseResume {
+    cursor: pointer;
+        
 }
