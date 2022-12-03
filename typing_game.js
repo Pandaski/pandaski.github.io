@@ -136,7 +136,7 @@ G.F.loadMain = function () {
         .turnOff();
         
     G.makeGob('English', G.O.viewport)
-        .setVar({x:0, y:450, w:800, h:600, keyIn: G.F.EnglishKeyIn, submit: G.F.EnglishSubmit})
+        .setVar({x:0, y:450, w:800, h:100, keyIn: G.F.EnglishKeyIn, submit: G.F.EnglishSubmit})
         .setState({word: '', completed: false, finishedWithoutErrOrTips:true, entered: '', pos:0})
         .turnOff();
         
