@@ -155,8 +155,8 @@ G.F.loadMain = function () {
         .turnOff();
         
     G.makeGob('startParticipate', G.O.viewport)
-        .setVar({x:200, y:220, w:400, h:50, AI: G.F.startPAI})
-        .setSrc('Participate/练习')
+        .setVar({x:150, y:220, w:500, h:50, AI: G.F.startPAI})
+        .setSrc('Participate/练习 - 需要键盘')
         .setState({isRunning: false})
         .turnOff();
         
@@ -164,7 +164,7 @@ G.F.loadMain = function () {
     
     G.makeGob('startExam', G.O.viewport)
         .setVar({x:200, y:320, w:400, h:50, AI: G.F.startEAI})
-        .setSrc('Exam/默写')
+        .setSrc('Exam/默写 - 需要纸笔')
         .turnOff();
         
     G.O.startExam.tag.onclick = G.F.initPlayer;
