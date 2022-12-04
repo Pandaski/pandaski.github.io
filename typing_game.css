@@ -91,8 +91,15 @@
 }
 
 
-#wordLoader, #help {
+#wordLoader {
     color:#ddd;
+    border: 0px solid red;
+    font: 24px 'Comic Sans MS',Verdana,Arial,sans-serif;
+    cursor: pointer;
+}
+
+#help {
+    color:yellow;
     border: 0px solid red;
     font: 24px 'Comic Sans MS',Verdana,Arial,sans-serif;
     cursor: pointer;
@@ -156,10 +163,33 @@
     text-align:center;
 }
 
-#helpDetail {
+#helpDetail, #wordLoadingForm {
     color:#ddd;
     border: 1px solid white;
     font: 20px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+}
+
+#wordInputTips {
+    color: #ddd;
+    border: 0px solid white;
+    font: 14px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;
+}
+
+#wordInput {
+    resize: none;
+    background-color: #000;
+    color: #ddd;
+    font: 14px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;  
+}
+
+#wordInputError {
+    color: yellow;
+    font: 14px ‘微软雅黑’,'华文细黑','Comic Sans MS',Verdana,Arial,sans-serif;  
+}
+#wordInputOK, #wordInputCancel {
+    border: 1px dotted white;
+    cursor: pointer;
+    text-align:center;
 }
 
 #helpDetail li{

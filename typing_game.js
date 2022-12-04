@@ -8,7 +8,8 @@
         */
 var GameStage = {
     notReady: 0,
-    readyToRun: 1,
+    loadingWordList: 2,
+    readyToRun: 5,
     runningP: 10,
     prepareE: 20,
     runningE: 25,
@@ -24,6 +25,7 @@ G.F.getExamSpeed = function (o) {
 
 var GobVisiblityMapping = {
     notReady: ['wordLoader', 'help', 'helpPointer', 'copyright'],
+    loadingWordList: ['wordLoadingForm'],
     readyToRun: ['startParticipate', 'startExam', 'wordLoader', 'help', 'timer', 'score', 'copyright'],
     runningP: ['Chinese', 'English', 'timer', 'score', 'voiceTips', 'visualTips', 'EnglishTips', 'copyright', 'pause'],
     prepareE: ['Chinese', 'timer', 'score', 'copyright'],
@@ -199,9 +201,40 @@ G.F.loadMain = function () {
         .turnOff();
     
     G.makeGob('wordLoader', G.O.viewport)
-        .setVar({x:650, y:550, w:150, h:50})
-        .setSrc('Load Words<input type="file" id="loader" style="display:none">')
-        .turnOff().tag.onclick=G.F.loadWordList;
+        .setVar({x:650, y:550, w:150, h:50, AI:G.F.wordLoaderAI})
+        .setSrc('Load Words')
+        .turnOff();
+    
+    G.makeGob('wordLoadingForm', G.O.viewport)
+        .setVar({x:100, y:20, w:600, h:550})
+        .turnOff();
+    
+    G.makeGob('wordInput', G.O.wordLoadingForm, 'textarea')
+        .setVar({x:25, y:90, w:550, h:370})
+        .setStyle({overflowY: 'scroll', overflowX: 'auto'})
+        .turnOn();
+    
+    G.makeGob('wordInputTips', G.O.wordLoadingForm)
+        .setVar({x:10, y:0, w:550, h:100})
+        .setSrc('<ul><li>词语列表内每行有一个中文词和对应的英文单词，用英语逗号（,）分开。</li>' + 
+                '<li>必须中文在前英文在后。如：小屋,hut</li>' + 
+                '<li>英语单词内只允许出现字母和空格。</li></ul>')
+        .turnOn();
+    
+    G.makeGob('wordInputError', G.O.wordLoadingForm)
+        .setVar({x:25, y:470, w:600, h:40})
+        .setSrc('输入的文字不完全符合要求，请检查并修正后再输入')
+        .turnOff();
+    
+    G.makeGob('wordInputOK', G.O.wordLoadingForm)
+        .setVar({x:120, y:500, w:100, h:30, AI:G.F.wordInputOKAI})
+        .setSrc('OK')
+        .turnOn();
+    
+    G.makeGob('wordInputCancel', G.O.wordLoadingForm)
+        .setVar({x:400, y:500, w:100, h:30, AI:G.F.wordInputCancelAI})
+        .setSrc('Cancel')
+        .turnOn();
     
     G.makeGob('help', G.O.viewport)
         .setVar({x:20, y:550, w:150, h:50, AI: G.F.helpAI})
@@ -212,7 +245,7 @@ G.F.loadMain = function () {
         .setVar({x:100, y:50, w:600, h:500})
         .setSrc('这是一个结合了英语背诵和打字训练的小工具，以下是使用方法。' + 
         '<ol ">' + 
-        '<li>用户提前准备一个单词列表文本文件(txt文件)。文件里每行有一个中文词和对应的英文单词，用逗号（,）分开。如图所示。注意：必须中文在前英文在后。<br>'+
+        '<li>用户提前准备一组单词列表，列表内每行有一个中文词和对应的英文单词，用逗号（,）分开。如图所示。注意：必须中文在前英文在后。<br>'+
         '<img width="200px" src="data:image/png;base64,' + resources.image.EXAMPLE + '">' +
         '</li>' +
         '<li>英语单词里可以有字母或空格，但不能有其他符号。</li>' +
@@ -252,6 +285,10 @@ G.F.loadMain = function () {
 G.F.mainAI = function () {
     
     var prevGameStage = G.S.gameStage;
+    
+    G.O.wordLoader.AI();
+    G.O.wordInputOK.AI();
+    G.O.wordInputCancel.AI();
     
     G.O.startParticipate.AI();
     G.O.startExam.AI();
@@ -621,14 +658,27 @@ G.F.initPlayer = function () {
     }
 }
 
+G.F.wordLoaderAI = function() {
+    var t = this;
+    
+    if (t.on && t.tagContainsMouseClick()) {
+        G.S.gameStage = GameStage.loadingWordList;
+        
+        G.O.wordInputError.turnOff();
+        var text = G.F.arrayToText(G.S.wordList);
+        G.O.wordInput.tag.value=text;
+    }
+    
+    return t;
+}
 
-G.F.textToArray = function(str, delimiter = ",") {
-    var rows = str.split("\n");
+G.F.textToArray = function(text) {
+    var rows = text.trim().split('\n');
     var arr = [];
     for (var i=0; i<rows.length; i++) {
         var row = rows[i];
-        if (row.indexOf(delimiter) >= 0) {
-            var values = row.split(delimiter);
+        if (row.indexOf(',') >= 0) {
+            var values = row.split(',');
             arr.push({
                 Chinese: values[0].trim(),
                 English: values[1].trim()
@@ -638,34 +688,60 @@ G.F.textToArray = function(str, delimiter = ",") {
     return arr;
 }
 
+G.F.arrayToText = function(arr) {
+    var text = '';
+    for (var i=0; i<arr.length; i++) {
+        var o = arr[i];
+        text += o.Chinese + ',' + o.English;
+        if (i < arr.length-1) {
+            text += '\n';
+        }
+    }  
+    return text;
+}
+
+G.F.validateWordInputText = function (text) {
+    var rows = text.trim().split('\n');
+    var arr = [];
+    var passed = true;
+    var hasNotEmptyRow = false;
+    for (var i=0; i<rows.length; i++) {
+        var row = rows[i].trim();
+        if (row.length == 0) {
+            continue;
+        }
+        hasNotEmptyRow = true;
+        if (row.indexOf(',') < 0 || row.split(',')[1].trim().match(/^[ a-zA-Z]+$/) == null) {
+            passed = false;
+            break;
+        }
+    }  
+    
+    return passed && hasNotEmptyRow;
+}
+
 
 G.F.loadWordList = function () {
-    var loader = document.getElementById("loader");
-    var reader = new FileReader();
-
-    reader.onload = function (e) {
-        const text = e.target.result;
-        
-        try {
-            var wordList = G.F.textToArray(text);
-            
+    var wordInput = G.O.wordInput.tag;
+    try {
+        var inputed = wordInput.value.trim();
+        if (!G.F.validateWordInputText(inputed)) {
+            G.O.wordInputError.turnOn();
+        } else {
+            G.O.wordInputError.turnOff();
+            var wordList = G.F.textToArray(wordInput.value.trim());
+                
             localStorage.setItem('wordList', JSON.stringify(wordList));
             G.setState({wordList: wordList,
                 wordCount: wordList.length,
                 gameStage: GameStage.readyToRun
             });
             G.O.score.setSrc('0/' + G.S.wordList.length).draw();
-                        
-        } catch (error) {
-            console.log(error)
         }
-    };
-
-    loader.addEventListener('change',function(){
-        const file = this.files[0];
-        reader.readAsText(file);
-    })
-    loader.click();
+        
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 G.F.loadStoredWordList = function () {
@@ -681,6 +757,25 @@ G.F.loadStoredWordList = function () {
     }
 }
 
+G.F.wordInputCancelAI = function () {
+    var t = this;    
+    if (t.on && !G.S.audioLocked && t.tagContainsMouseClick()) { 
+              
+        G.S.gameStage = G.S.prevGameStage;
+    }
+    
+    return t;
+}
+
+G.F.wordInputOKAI = function () {
+    var t = this;    
+    if (t.on && !G.S.audioLocked && t.tagContainsMouseClick()) { 
+        G.F.loadWordList();
+        
+    }
+    
+    return t;
+}
 
 G.F.gameStageChanged = function (prevGameStage, nowGameStage) {
     G.S.prevGameStage = prevGameStage;
