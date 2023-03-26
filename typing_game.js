@@ -55,6 +55,13 @@ G.F.controlGobVisibility = function () {
     }
 }
 
+var allowedKeys = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'SPACE', '-', 'ENTER', '.', "'"];
+var specialKeyMapping = {
+    '-': String.fromCharCode(189),
+    '.': String.fromCharCode(190),
+    "'": String.fromCharCode(222)
+}
+
 G.F.loadMain = function () { 
     this.AI = G.F.mainAI; 
     
@@ -80,11 +87,10 @@ G.F.loadMain = function () {
         }
     }
     
-    var allowedKeys = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'SPACE', '-', 'ENTER'];
     for (var i = 0; i < allowedKeys.length; i++) {
         var key = allowedKeys[i];
-        if (key == '-') {
-            key = '½';
+        if (specialKeyMapping[key]) {
+            key = specialKeyMapping[key];
         }
         G.KB.addKeys(key);
         G.KB.keys[key].setKeyUpEvent(G.F.keyUp);
@@ -527,8 +533,9 @@ G.F.keyUp = function() {
     if (lastKey.keyStr != 'ENTER') {
         var kin = '';
         if (lastKey.keyStr.length == 1) {
-            if (lastKey.keyStr == '½') {
-                lastKey.keyStr = '-'
+            var specialKey = Object.keys(specialKeyMapping).find(key => specialKeyMapping[key] === lastKey.keyStr);
+            if (specialKey) {
+                lastKey.keyStr = specialKey;
             }
             
             if (lastKey.shiftKey) {
@@ -719,7 +726,7 @@ G.F.validateWordInputText = function (text) {
             continue;
         }
         hasNotEmptyRow = true;
-        if (row.indexOf(',') < 0 || row.split(',')[1].trim().match(/^[ \-a-zA-Z]+$/) == null) {
+        if (row.indexOf(',') < 0 || row.split(',')[1].trim().match(/^[\.\' \-a-zA-Z]+$/) == null) {
             passed = false;
             break;
         }
