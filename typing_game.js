@@ -226,9 +226,9 @@ G.F.loadMain = function () {
     
     G.makeGob('wordInputTips', G.O.wordLoadingForm)
         .setVar({x:10, y:0, w:550, h:100})
-        .setSrc('<ul><li>词语列表内每行有一个中文词和对应的英文单词，用英语逗号（,）分开。</li>' + 
+        .setSrc('<ul><li>词语列表内每行有一个中文词和对应的英文单词，用英语竖线（|）分开。</li>' + 
                 '<li>必须中文在前英文在后。如：小屋,hut</li>' + 
-                '<li>英语单词内只允许出现字母和空格。</li></ul>')
+                '<li>英语单词内只允许出现字母、空格、连字符（-）、点（.）、单引号(\')。</li></ul>')
         .turnOn();
     
     G.makeGob('wordInputError', G.O.wordLoadingForm)
@@ -255,13 +255,13 @@ G.F.loadMain = function () {
         .setVar({x:100, y:50, w:600, h:500})
         .setSrc('这是一个结合了英语背诵和打字训练的小工具，以下是使用方法。' + 
         '<ol ">' + 
-        '<li>用户提前准备一组单词列表，列表内每行有一个中文词和对应的英文单词，用逗号（,）分开。如图所示。注意：必须中文在前英文在后。<br>'+
-        '<img width="200px" src="data:image/png;base64,' + resources.image.EXAMPLE + '">' +
+        '<li>用户提前准备一组单词列表，列表内每行有一个中文词和对应的英文单词，用竖线（|）分开。如图所示。注意：必须中文在前英文在后。<br>'+
+        '<img width="140px" src="./example.png">' +
         '</li>' +
-        '<li>英语单词里可以有字母、空格、连字符（-），但不能有其他符号。</li>' +
+        '<li>英语单词里可以有字母、空格、连字符（-）、点（.）、单引号(\')，但不能有其他符号。</li>' +
         '<li>点击右下角的“Load Words”加载单词。</li>' +
         '<li>点击游戏中间的“练习”或“默写”开始对应的模式。</li>' +
-        '<li>练习模式中工具会打乱单词列表后逐一显示中文词语，并同时朗读英语单词发音*。用户需要在键盘上正确的逐一打出该单词的每个字母（包括空格），直到全部正确输入完成。如果输入字母不正确，工具会通过蜂鸣声提示。</li>' +
+        '<li>练习模式中工具会打乱单词列表后逐一显示中文词语，并同时朗读英语单词发音*。用户需要在键盘上正确的逐一打出该单词的每个字母和字符（包括空格），直到全部正确输入完成。如果输入字母不正确，工具会通过蜂鸣声提示。</li>' +
         '<li>请注意工具是区分大小写的，例如遇到“Russia”时必须按Shift + r才能正确的输入。</li>' +
         '<li>练习中可以点击🔊或👀图标重听或看正确结果，也可以按回车或点击中文文字跳到下一个词。</li>' +
         '<li>当全部单词都练习完成后，可以选择用同一批单词重新练习，或加载新一批单词。</li>' +
@@ -692,8 +692,8 @@ G.F.textToArray = function(text) {
     var arr = [];
     for (var i=0; i<rows.length; i++) {
         var row = rows[i];
-        if (row.indexOf(',') >= 0) {
-            var values = row.split(',');
+        if (row.indexOf('|') >= 0) {
+            var values = row.split('|');
             arr.push({
                 Chinese: values[0].trim(),
                 English: values[1].trim()
@@ -707,7 +707,7 @@ G.F.arrayToText = function(arr) {
     var text = '';
     for (var i=0; i<arr.length; i++) {
         var o = arr[i];
-        text += o.Chinese + ',' + o.English;
+        text += o.Chinese + '|' + o.English;
         if (i < arr.length-1) {
             text += '\n';
         }
@@ -726,7 +726,7 @@ G.F.validateWordInputText = function (text) {
             continue;
         }
         hasNotEmptyRow = true;
-        if (row.indexOf(',') < 0 || row.split(',')[1].trim().match(/^[\.\' \-a-zA-Z]+$/) == null) {
+        if (row.indexOf('|') < 0 || row.split('|')[1].trim().match(/^[\.\' \-a-zA-Z]+$/) == null) {
             passed = false;
             break;
         }
