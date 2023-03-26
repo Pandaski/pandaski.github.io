@@ -80,10 +80,14 @@ G.F.loadMain = function () {
         }
     }
     
-    var allowedKeys = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'SPACE', 'ENTER'];
+    var allowedKeys = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'SPACE', '-', 'ENTER'];
     for (var i = 0; i < allowedKeys.length; i++) {
-        G.KB.addKeys(allowedKeys[i]);
-        G.KB.keys[allowedKeys[i]].setKeyUpEvent(G.F.keyUp);
+        var key = allowedKeys[i];
+        if (key == '-') {
+            key = '½';
+        }
+        G.KB.addKeys(key);
+        G.KB.keys[key].setKeyUpEvent(G.F.keyUp);
     }
     
     G.makeGob('viewport', G)
@@ -248,7 +252,7 @@ G.F.loadMain = function () {
         '<li>用户提前准备一组单词列表，列表内每行有一个中文词和对应的英文单词，用逗号（,）分开。如图所示。注意：必须中文在前英文在后。<br>'+
         '<img width="200px" src="data:image/png;base64,' + resources.image.EXAMPLE + '">' +
         '</li>' +
-        '<li>英语单词里可以有字母或空格，但不能有其他符号。</li>' +
+        '<li>英语单词里可以有字母、空格、连字符（-），但不能有其他符号。</li>' +
         '<li>点击右下角的“Load Words”加载单词。</li>' +
         '<li>点击游戏中间的“练习”或“默写”开始对应的模式。</li>' +
         '<li>练习模式中工具会打乱单词列表后逐一显示中文词语，并同时朗读英语单词发音*。用户需要在键盘上正确的逐一打出该单词的每个字母（包括空格），直到全部正确输入完成。如果输入字母不正确，工具会通过蜂鸣声提示。</li>' +
@@ -523,6 +527,10 @@ G.F.keyUp = function() {
     if (lastKey.keyStr != 'ENTER') {
         var kin = '';
         if (lastKey.keyStr.length == 1) {
+            if (lastKey.keyStr == '½') {
+                lastKey.keyStr = '-'
+            }
+            
             if (lastKey.shiftKey) {
                 kin = lastKey.keyStr;
             } else {
@@ -551,7 +559,7 @@ G.F.EnglishKeyIn = function (kin) {
         t.S.pos += 1;
         t.setSrc(G.O.English.S.entered.replace(/ /g, '&nbsp;')).draw();
         
-        if (kin != ' ') {
+        if (kin.match(/[A-Z]/i)) {
             G.O.audioPlayer.play('static', kin, null, true, t.S.entered == t.S.word);
         }
     } else {
@@ -711,7 +719,7 @@ G.F.validateWordInputText = function (text) {
             continue;
         }
         hasNotEmptyRow = true;
-        if (row.indexOf(',') < 0 || row.split(',')[1].trim().match(/^[ a-zA-Z]+$/) == null) {
+        if (row.indexOf(',') < 0 || row.split(',')[1].trim().match(/^[ \-a-zA-Z]+$/) == null) {
             passed = false;
             break;
         }
