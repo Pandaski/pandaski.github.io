@@ -20,7 +20,7 @@ var GameStage = {
 }
 
 G.F.getExamSpeed = function (o) {
-    return 10 + (o.Chinese.length + o.English.length) * 0.5; 
+    return 7 + (o.Chinese.length + o.English.length) * 0.3; 
 }
 
 var GobVisiblityMapping = {
@@ -345,7 +345,7 @@ G.F.mainAI = function () {
     
     if (G.S.gameStage == GameStage.runningE) {
         var now = new Date();
-        if (Math.floor((now - G.O.Chinese.S.startTime - G.S.gameStat.pausedTime) / 1000) >= G.F.getExamSpeed(G.S.wordList[G.S.wordIndex])) {
+        if ((G.O.English.S.completed && !G.S.audioLocked) || Math.floor((now - G.O.Chinese.S.startTime - G.S.gameStat.pausedTime) / 1000) >= G.F.getExamSpeed(G.S.wordList[G.S.wordIndex])) {
             G.S.wordIndex ++;
             G.S.finishedCount ++;
             
